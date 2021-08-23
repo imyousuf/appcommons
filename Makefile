@@ -47,22 +47,6 @@ generate:
 
 dep-tools:
 
-build: build-init
-	@echo "Architecture: $(ARCH)"
-	go build -mod=readonly
-ifeq ($(OS),Ubuntu)
-	env CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -mod=readonly
-	env CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -mod=readonly
-endif
-ifndef APP_VERSION
-	@echo "Version: $(shell git log --pretty=format:'%h' -n 1)"
-	$(eval this_version := $(shell git log --pretty=format:'%h' -n 1))
-endif
-ifdef APP_VERSION
-	@echo "Version (Ref): $(APP_VERSION)"
-	$(eval this_version := $(APP_VERSION))
-endif
-
 time-test:
 	time go test -timeout 30s -mod=readonly ./... -count=1
 

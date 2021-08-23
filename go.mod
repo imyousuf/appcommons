@@ -8,8 +8,10 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ini/ini v1.62.0
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
+	github.com/rs/xid v1.2.1
 	github.com/rs/zerolog v1.23.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.7.0

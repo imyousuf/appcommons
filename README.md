@@ -1,2 +1,3 @@
-# appconfig
-An application configuration API intended to serve as base for application configuration to extend and build on
+# appcommons - App Commons
+
+A collection of common APIs for application to extend and build on

@@ -1,0 +1,51 @@
+# The CI for Application configuration
+#
+name: "AppCommons CI"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.2'
+    - name: Create dist
+      run: mkdir ./dist/
+    - name: Run Test & Build
+      run: make os-deps dep-tools deps build ci-test
+
+  coverage:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.16.2'
+    - name: Create dist
+      run: mkdir ./dist/
+    - name: Install dependencies
+      run: make dep-tools deps
+    - uses: actions/setup-node@master
+      with:
+        node-version: '12'
+    - uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
+      with:
+        coverageCommand: go test -timeout 30s -coverprofile=cover.out ./... -short
+        debug: true
+        prefix: github.com/imyousuf/appcommons/
+        coverageLocations: |
+          ${{github.workspace}}/*.out:gocov

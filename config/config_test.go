@@ -51,11 +51,12 @@ func toSecond(second uint) time.Duration {
 }
 
 func TestGetAutoConfiguration_Default(t *testing.T) {
-	config, cfgErr := GetAutoConfiguration()
+	config, cfgFile, cfgErr := GetAutoConfiguration()
 	if cfgErr != nil {
 		t.Error("Auto Configuration failed", cfgErr)
 		t.Fail()
 	}
+	assert.NotNil(t, cfgFile)
 	assert.Equal(t, SQLite3Dialect, config.GetDBDialect())
 	assert.Equal(t, "database.sqlite3?_foreign_keys=on", config.GetDBConnectionURL())
 	assert.Equal(t, time.Duration(0), config.GetDBConnectionMaxIdleTime())
@@ -78,7 +79,7 @@ func TestGetAutoConfiguration_WrongValues(t *testing.T) {
 	LoadConfiguration = func(location string) (*ini.File, error) {
 		return ini.InsensitiveLoad([]byte(wrongValueConfig))
 	}
-	config, cfgErr := GetAutoConfiguration()
+	config, _, cfgErr := GetAutoConfiguration()
 	if cfgErr != nil {
 		t.Error("Auto Configuration failed", cfgErr)
 		t.Fail()
@@ -106,7 +107,7 @@ func TestGetAutoConfiguration_LoadConfigurationError(t *testing.T) {
 	LoadConfiguration = func(location string) (*ini.File, error) {
 		return ini.InsensitiveLoad([]byte(errorConfig))
 	}
-	config, cfgErr := GetAutoConfiguration()
+	config, _, cfgErr := GetAutoConfiguration()
 	if cfgErr == nil {
 		t.Error("Auto Configuration should have failed")
 	}
@@ -121,7 +122,7 @@ func TestGetAutoConfiguration_CurrentUserError(t *testing.T) {
 	currentUser = func() (*user.User, error) {
 		return nil, errors.New("Unit test error")
 	}
-	_, cfgErr := GetAutoConfiguration()
+	_, _, cfgErr := GetAutoConfiguration()
 	if cfgErr != nil {
 		t.Error("Auto Configuration failed", cfgErr)
 	}
@@ -131,7 +132,7 @@ func TestGetAutoConfiguration_CurrentUserError(t *testing.T) {
 }
 
 func TestGetConfiguration(t *testing.T) {
-	config, cfgErr := GetConfiguration("./test-appconfig.cfg")
+	config, _, cfgErr := GetConfiguration("./test-appconfig.cfg")
 	if cfgErr != nil {
 		t.Error("Auto Configuration failed", cfgErr)
 		t.Fail()
@@ -262,11 +263,11 @@ func TestGetConfigurationFromParseConfig_ValueError(t *testing.T) {
 
 func TestGetConfigurationFromCLIConfig(t *testing.T) {
 	t.Run("EmptyPath", func(t *testing.T) {
-		_, err := GetConfigurationFromCLIConfig(&CLIConfig{})
+		_, _, err := GetConfigurationFromCLIConfig(&CLIConfig{})
 		assert.Nil(t, err)
 	})
 	t.Run("WithPath", func(t *testing.T) {
-		_, err := GetConfigurationFromCLIConfig(&CLIConfig{ConfigPath: "./test-webhook-broker.cfg"})
+		_, _, err := GetConfigurationFromCLIConfig(&CLIConfig{ConfigPath: "./test-webhook-broker.cfg"})
 		assert.Nil(t, err)
 	})
 }

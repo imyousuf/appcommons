@@ -221,12 +221,12 @@ func (config *Config) IsCompressionEnabledOnLogBackups() bool {
 
 // GetAutoConfiguration gets configuration from default config and system defined path chain of
 // /etc/webhook-broker/webhook-broker.cfg, {USER_HOME}/.webhook-broker/webhook-broker.cfg, webhook-broker.cfg (current dir)
-func GetAutoConfiguration() (*Config, error) {
+func GetAutoConfiguration() (*Config, *ini.File, error) {
 	return GetConfiguration("")
 }
 
 // GetConfigurationFromCLIConfig from CLIConfig.
-func GetConfigurationFromCLIConfig(cliConfig *CLIConfig) (*Config, error) {
+func GetConfigurationFromCLIConfig(cliConfig *CLIConfig) (*Config, *ini.File, error) {
 	if len(cliConfig.ConfigPath) > 0 {
 		return GetConfiguration(cliConfig.ConfigPath)
 	}
@@ -234,12 +234,13 @@ func GetConfigurationFromCLIConfig(cliConfig *CLIConfig) (*Config, error) {
 }
 
 // GetConfiguration gets the current state of application configuration
-func GetConfiguration(configFilePath string) (*Config, error) {
+func GetConfiguration(configFilePath string) (*Config, *ini.File, error) {
 	cfg, err := LoadConfiguration(configFilePath)
 	if err != nil {
-		return EmptyConfigurationForError, err
+		return EmptyConfigurationForError, nil, err
 	}
-	return GetConfigurationFromParseConfig(cfg)
+	conf, err := GetConfigurationFromParseConfig(cfg)
+	return conf, cfg, err
 }
 
 // GetConfigurationFromParseConfig returns configuration from parsed configuration

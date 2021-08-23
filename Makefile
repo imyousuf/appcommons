@@ -46,6 +46,9 @@ build-init:
 generate:
 
 dep-tools:
+ifneq ($(OS),Alpine Linux)
+	go get github.com/golang-migrate/migrate/v4/cmd/migrate
+endif
 
 time-test:
 	time go test -timeout 30s -mod=readonly ./... -count=1

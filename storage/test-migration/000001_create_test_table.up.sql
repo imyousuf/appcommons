@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS `test` (
+    `id` VARCHAR(255) NOT NULL PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `note` VARCHAR(255) NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `updatedAt` DATETIME NOT NULL
+);

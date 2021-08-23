@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"testing"
@@ -268,5 +269,39 @@ func TestCLIConfigPathChangeNotification(t *testing.T) {
 			t.FailNow()
 		})
 		assert.False(t, inConfig.IsConfigWatcherStarted())
+	})
+}
+
+func TestParseCLIArgs(t *testing.T) {
+	absPath, _ := filepath.Abs("../migration")
+	t.Run("FlagParseError", func(t *testing.T) {
+		t.Parallel()
+		_, _, err := ParseCLIArgs("sample-app", []string{"-migrate1", "no such path"})
+		assert.NotNil(t, err)
+	})
+	t.Run("NonExistentMigrationSource", func(t *testing.T) {
+		t.Parallel()
+		_, _, err := ParseCLIArgs("sample-app", []string{"-migrate", "no such path"})
+		assert.NotNil(t, err)
+	})
+	t.Run("MigrationSourceNotDir", func(t *testing.T) {
+		t.Parallel()
+		_, _, err := ParseCLIArgs("sample-app", []string{"-migrate", "../Makefile"})
+		assert.NotNil(t, err)
+		assert.Equal(t, err, errMigrationSrcNotDir)
+	})
+	t.Run("ValidMigrationSourceAbs", func(t *testing.T) {
+		t.Parallel()
+		cliConfig, _, err := ParseCLIArgs("sample-app", []string{"-migrate", "../migration"})
+		assert.Nil(t, err)
+		assert.True(t, cliConfig.IsMigrationEnabled())
+		assert.Equal(t, "file://"+absPath, cliConfig.MigrationSource)
+	})
+	t.Run("ValidMigrationSourceRelative", func(t *testing.T) {
+		t.Parallel()
+		cliConfig, _, err := ParseCLIArgs("sample-app", []string{"-migrate", absPath})
+		assert.Nil(t, err)
+		assert.True(t, cliConfig.IsMigrationEnabled())
+		assert.Equal(t, "file://"+absPath, cliConfig.MigrationSource)
 	})
 }

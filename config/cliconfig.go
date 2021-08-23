@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"flag"
 	"io"
 	"os"
 	"path/filepath"
@@ -19,6 +20,8 @@ import (
 var (
 	errNoFileToWatch       = errors.New("no file to watch")
 	errTruncatedConfigFile = errors.New("truncated config file")
+	// errMigrationSrcNotDir for error when migration source specified is not a directory
+	errMigrationSrcNotDir = errors.New("migration source not a dir")
 )
 
 // CLIConfig represents the Command Line Args config
@@ -196,5 +199,38 @@ var (
 			}
 		}
 		return hashHex, err
+	}
+
+	ParseCLIArgs = func(programName string, args []string) (cliConfig *CLIConfig, output string, err error) {
+		flags := flag.NewFlagSet(programName, flag.ContinueOnError)
+		var buf bytes.Buffer
+		flags.SetOutput(&buf)
+
+		var conf CLIConfig
+		flags.StringVar(&conf.ConfigPath, "config", "", "Config file location")
+		flags.StringVar(&conf.MigrationSource, "migrate", "", "Migration source folder")
+		flags.BoolVar(&conf.StopOnConfigChange, "stop-on-conf-change", false, "Restart internally on -config change if this flag is absent")
+		flags.BoolVar(&conf.DoNotWatchConfigChange, "do-not-watch-conf-change", false, "Do not watch config change")
+
+		err = flags.Parse(args)
+		if err != nil {
+			return nil, buf.String(), err
+		}
+
+		if len(conf.MigrationSource) > 0 {
+			fileInfo, err := os.Stat(conf.MigrationSource)
+			if err != nil {
+				return nil, "Could not determine migration source details", err
+			}
+			if !fileInfo.IsDir() {
+				return nil, "Migration source must be a dir", errMigrationSrcNotDir
+			}
+			if !filepath.IsAbs(conf.MigrationSource) {
+				conf.MigrationSource, _ = filepath.Abs(conf.MigrationSource)
+			}
+			conf.MigrationSource = "file://" + conf.MigrationSource
+		}
+
+		return &conf, buf.String(), nil
 	}
 )

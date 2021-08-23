@@ -44,7 +44,7 @@ func TestCLIConfigPathChangeNotification(t *testing.T) {
 	t.Run("NotifiedOnFileChange", func(t *testing.T) {
 		err := writeToFile(notificationFilePath, notificationInitialContent)
 		if err != nil {
-			log.Fatal().Err(err).Msg("could not write to file")
+			log.Fatal().Err(err).Msg("could not write to file the first time")
 		}
 		cliConfig := &CLIConfig{ConfigPath: notificationFilePath}
 		var wg sync.WaitGroup
@@ -57,7 +57,7 @@ func TestCLIConfigPathChangeNotification(t *testing.T) {
 		time.Sleep(5 * time.Millisecond)
 		err = writeToFile(notificationFilePath, notificationDifferentContent)
 		if err != nil {
-			log.Fatal().Err(err).Msg("could not write to file")
+			log.Fatal().Err(err).Msg("could not write to file to update")
 		}
 		wg.Wait()
 	})

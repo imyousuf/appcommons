@@ -70,7 +70,7 @@ jobs:
        make os-deps
        make dep-tools
        make deps
-       make build
+       make ci-test
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1

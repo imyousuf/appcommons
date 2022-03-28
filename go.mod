@@ -10,7 +10,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.10
-	github.com/rs/xid v1.3.0
+	github.com/rs/xid v1.4.0
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.0
 )

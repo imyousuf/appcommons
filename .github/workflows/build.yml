@@ -19,6 +19,7 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: '1.16.2'
+    - run: sudo apt-get update
     - name: Create dist
       run: mkdir ./dist/
     - name: Run Test & Build
@@ -33,6 +34,7 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: '1.16.2'
+    - run: sudo apt-get update
     - name: Create dist
       run: mkdir ./dist/
     - name: Install dependencies
